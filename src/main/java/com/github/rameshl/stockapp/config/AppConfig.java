@@ -16,13 +16,20 @@ public class AppConfig extends Application {
     @Override
     public Set<Class<?>> getClasses() {
 
+        Set<Class<?>> classes = new HashSet<>(getProviders());
+
+        //apis
+        classes.add(StocksEndpoint.class);
+
+        return classes;
+    }
+
+    public Set<Class<?>> getProviders() {
+
         Set<Class<?>> classes = new HashSet<>();
 
         // jackson
         classes.add(JacksonObjectResolver.class);
-
-        //apis
-        classes.add(StocksEndpoint.class);
 
         // exception handlers
         classes.add(GenericExceptionMapper.class);

@@ -4,11 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.rameshdev.base.JaxrsServerConfig;
 import com.github.rameshdev.resteasy.ResteasyServer;
 import com.github.rameshdev.resteasy.ResteasyUnit;
-import com.github.rameshl.stockapp.config.JacksonObjectResolver;
+import com.github.rameshl.stockapp.config.AppConfig;
 import com.github.rameshl.stockapp.endpoints.api.stocks.StocksEndpoint;
 import com.github.rameshl.stockapp.model.ErrorResponse;
 import com.github.rameshl.stockapp.model.Stock;
-import com.github.rameshl.stockapp.utils.GenericExceptionMapper;
 
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.Before;
@@ -40,11 +39,27 @@ public class StocksEndpointTestIT {
     public void before() {
 
         JaxrsServerConfig config = JaxrsServerConfig.empty()
+                // with stock endpoint
                 .withResources(StocksEndpoint.class)
-                .withProviders(JacksonObjectResolver.class)
-                .withProviders(GenericExceptionMapper.class);
+
+                // available providers
+                .withProviders(new AppConfig().getProviders().toArray(new Class<?>[0]));
 
         server = ResteasyUnit.newServerWithConfig(config);
+    }
+
+    /**
+     * Method: fetchStockById(@PathParam("id") long stockId)
+     */
+    @Test
+    public void testFetchStockById_InvalidID() throws Exception {
+
+        MockHttpResponse response = server.resource(BASE_STOCK_PATH + "/" + System.currentTimeMillis()).get();
+
+        assertEquals(404, response.getStatus());
+        assertEquals(MediaType.APPLICATION_JSON, response.getOutputHeaders().getFirst("content-type"));
+
+        checkErrorResponse(response.getContentAsString(), "not_found", "no stock found for id");
     }
 
     /**
@@ -72,27 +87,7 @@ public class StocksEndpointTestIT {
      * Method: fetchStockById(@PathParam("id") long stockId)
      */
     @Test
-    public void testFetchStockById_InvalidID() throws Exception {
-
-        MockHttpResponse response = server.resource(BASE_STOCK_PATH + "/200").get();
-
-        assertEquals(404, response.getStatus());
-        assertEquals(MediaType.APPLICATION_JSON, response.getOutputHeaders().getFirst("content-type"));
-
-        String stockJson = response.getContentAsString();
-        assertNotNull(stockJson);
-
-        ErrorResponse errorResponse = defaultObjectMapper().readValue(stockJson, ErrorResponse.class);
-        assertNotNull(errorResponse);
-        assertEquals("not_found", errorResponse.getError());
-        assertEquals("no stock found for id", errorResponse.getErrorDesc());
-    }
-
-    /**
-     * Method: fetchStockById(@PathParam("id") long stockId)
-     */
-    @Test
-    public void testFetchStockById_validID() throws Exception {
+    public void testFetchStockById_valid() throws Exception {
 
         testFetchStockById(1);
 
@@ -109,10 +104,7 @@ public class StocksEndpointTestIT {
         MockHttpResponse response = server.resource(BASE_STOCK_PATH).post(MediaType.APPLICATION_JSON, "");
 
         assertEquals(400, response.getStatus());
-        ErrorResponse errorResponse = defaultObjectMapper().readValue(response.getContentAsString(), ErrorResponse.class);
-        assertNotNull(errorResponse);
-        assertEquals("bad_request", errorResponse.getError());
-        assertEquals("invalid stock data", errorResponse.getErrorDesc());
+        checkErrorResponse(response.getContentAsString(), "bad_request", "invalid stock data");
 
         Stock stock = new Stock();
 
@@ -120,10 +112,7 @@ public class StocksEndpointTestIT {
         response = server.resource(BASE_STOCK_PATH).post(MediaType.APPLICATION_JSON, defaultObjectMapper().writeValueAsString(stock));
 
         assertEquals(400, response.getStatus());
-        errorResponse = defaultObjectMapper().readValue(response.getContentAsString(), ErrorResponse.class);
-        assertNotNull(errorResponse);
-        assertEquals("bad_request", errorResponse.getError());
-        assertEquals("invalid id", errorResponse.getErrorDesc());
+        checkErrorResponse(response.getContentAsString(), "bad_request", "invalid id");
 
         stock.setId(100);
 
@@ -131,10 +120,7 @@ public class StocksEndpointTestIT {
         response = server.resource(BASE_STOCK_PATH).post(MediaType.APPLICATION_JSON, defaultObjectMapper().writeValueAsString(stock));
 
         assertEquals(400, response.getStatus());
-        errorResponse = defaultObjectMapper().readValue(response.getContentAsString(), ErrorResponse.class);
-        assertNotNull(errorResponse);
-        assertEquals("bad_request", errorResponse.getError());
-        assertEquals("invalid name, cannot be blank", errorResponse.getErrorDesc());
+        checkErrorResponse(response.getContentAsString(), "bad_request", "invalid name, cannot be blank");
     }
 
     /**
@@ -150,10 +136,7 @@ public class StocksEndpointTestIT {
         MockHttpResponse response = server.resource(BASE_STOCK_PATH).post(MediaType.APPLICATION_JSON, defaultObjectMapper().writeValueAsString(stock));
 
         assertEquals(400, response.getStatus());
-        ErrorResponse errorResponse = defaultObjectMapper().readValue(response.getContentAsString(), ErrorResponse.class);
-        assertNotNull(errorResponse);
-        assertEquals("bad_request", errorResponse.getError());
-        assertEquals("stock with id already exists", errorResponse.getErrorDesc());
+        checkErrorResponse(response.getContentAsString(), "bad_request", "stock with id already exists");
     }
 
     /**
@@ -179,6 +162,7 @@ public class StocksEndpointTestIT {
         assertEquals(stock.getName(), created.getName());
         assertNotNull(created.getLastUpdate());
 
+        //fetch stock and confirm
         testFetchStockById(stock.getId());
     }
 
@@ -186,7 +170,7 @@ public class StocksEndpointTestIT {
      * Method: updateStockPrice(@PathParam("id") long stockId, Stock stock)
      */
     @Test
-    public void testUpdateStockPrice_InvalidID() throws Exception {
+    public void testUpdateStockPrice_Invalid() throws Exception {
 
         /* invalid payload */
         MockHttpResponse response = server.resource(BASE_STOCK_PATH + "/" + System.currentTimeMillis())
@@ -195,13 +179,8 @@ public class StocksEndpointTestIT {
         assertEquals(400, response.getStatus());
         assertEquals(MediaType.APPLICATION_JSON, response.getOutputHeaders().getFirst("content-type"));
 
-        String errorJson = response.getContentAsString();
-        assertNotNull(errorJson);
+        checkErrorResponse(response.getContentAsString(), "bad_request", "invalid request payload");
 
-        ErrorResponse errorResponse = defaultObjectMapper().readValue(errorJson, ErrorResponse.class);
-        assertNotNull(errorResponse);
-        assertEquals("bad_request", errorResponse.getError());
-        assertEquals("invalid request payload", errorResponse.getErrorDesc());
 
         /* non existing id */
 
@@ -212,15 +191,8 @@ public class StocksEndpointTestIT {
                 .put(MediaType.APPLICATION_JSON, defaultObjectMapper().writeValueAsString(changes));
 
         assertEquals(404, response.getStatus());
-        assertEquals(MediaType.APPLICATION_JSON, response.getOutputHeaders().getFirst("content-type"));
 
-        errorJson = response.getContentAsString();
-        assertNotNull(errorJson);
-
-        errorResponse = defaultObjectMapper().readValue(errorJson, ErrorResponse.class);
-        assertNotNull(errorResponse);
-        assertEquals("not_found", errorResponse.getError());
-        assertEquals("no stock found for id", errorResponse.getErrorDesc());
+        checkErrorResponse(response.getContentAsString(), "not_found", "no stock found for id");
     }
 
     /**
@@ -263,4 +235,14 @@ public class StocksEndpointTestIT {
         assertEquals(id, stock.getId());
     }
 
+    private void checkErrorResponse(String json, String error, String desc) throws IOException {
+
+        assertNotNull(json);
+
+        ErrorResponse errorResponse = defaultObjectMapper().readValue(json, ErrorResponse.class);
+
+        assertNotNull(errorResponse);
+        assertEquals(error, errorResponse.getError());
+        assertEquals(desc, errorResponse.getErrorDesc());
+    }
 } 

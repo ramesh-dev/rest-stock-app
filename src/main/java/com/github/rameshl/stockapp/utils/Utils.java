@@ -11,12 +11,12 @@ public class Utils {
 
     public static ObjectMapper defaultObjectMapper() {
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper();
 
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-        return objectMapper;
+        return mapper;
     }
 
 }

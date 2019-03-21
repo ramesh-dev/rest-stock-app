@@ -63,6 +63,7 @@ public class StocksEndpoint extends BaseApiEndpoint {
         Preconditions.checkArgument(stock == null, "invalid request payload");
 
         stock = stockService.updateStockPrice(stockId, stock.getCurrentPrice());
+
         return Response.ok(stock).build();
     }
 }
