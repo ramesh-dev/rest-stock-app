@@ -26,13 +26,11 @@ public class GenericExceptionMapper implements ExceptionMapper<Throwable> {
 
         if (status == Response.Status.INTERNAL_SERVER_ERROR) {
 
-            e.printStackTrace();
             log.error("Generic Exception : {}", e.getMessage(), e);
-
             msg = "Something went wrong";
 
         } else {
-            msg = e.getMessage() != null ? e.getMessage() : status.toString();
+            msg = (e.getMessage() != null && !e.getMessage().startsWith("RESTEASY")) ? e.getMessage() : status.toString();
         }
 
         ErrorResponse errorResponse = new ErrorResponse(status.name().toLowerCase(), msg);

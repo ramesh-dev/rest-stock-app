@@ -3,6 +3,8 @@ package com.github.rameshl.stockapp.config;
 import com.github.rameshl.stockapp.endpoints.api.stocks.StocksEndpoint;
 import com.github.rameshl.stockapp.utils.GenericExceptionMapper;
 
+import org.jboss.resteasy.plugins.interceptors.CorsFilter;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,6 +24,22 @@ public class AppConfig extends Application {
         classes.add(StocksEndpoint.class);
 
         return classes;
+    }
+
+    @Override
+    public Set<Object> getSingletons() {
+
+        Set<Object> singletons = new HashSet<>();
+
+        CorsFilter cors = new CorsFilter();
+        cors.getAllowedOrigins().add("*");
+        cors.setCorsMaxAge(1728000);
+        cors.setAllowedMethods("OPTIONS, GET, POST, DELETE, PUT");
+        cors.setAllowCredentials(false);
+
+        singletons.add(cors);
+
+        return singletons;
     }
 
     public Set<Class<?>> getProviders() {

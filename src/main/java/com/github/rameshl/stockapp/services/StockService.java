@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import javax.ws.rs.NotFoundException;
 
@@ -44,9 +45,12 @@ public class StockService {
 
     public Stock createStock(Stock stock) throws IllegalArgumentException {
 
-        validateStock(stock);
-
-        Preconditions.checkArgument(getStock(stock.getId()) != null, "stock with id already exists");
+        // find available ids
+        if (stock != null) {
+            do {
+                stock.setId(randomID());
+            } while (getStock(stock.getId()) != null);
+        }
 
         return saveStock(stock);
     }
@@ -83,5 +87,12 @@ public class StockService {
         Preconditions.checkArgument(stock.getName() == null || stock.getName().trim().isEmpty(), "invalid name, cannot be blank");
 
         Preconditions.checkArgument(stock.getCurrentPrice() < 0, "stock price cannot be negative");
+    }
+
+    /* temporary id generator */
+    private long randomID() {
+        int low = 6;
+        int high = 1000;
+        return new Random().nextInt(high - low) + low;
     }
 }

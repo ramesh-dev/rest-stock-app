@@ -108,14 +108,6 @@ public class StocksEndpointTestIT {
 
         Stock stock = new Stock();
 
-        /* bad id */
-        response = server.resource(BASE_STOCK_PATH).post(MediaType.APPLICATION_JSON, defaultObjectMapper().writeValueAsString(stock));
-
-        assertEquals(400, response.getStatus());
-        checkErrorResponse(response.getContentAsString(), "bad_request", "invalid id");
-
-        stock.setId(100);
-
         /* bad name */
         response = server.resource(BASE_STOCK_PATH).post(MediaType.APPLICATION_JSON, defaultObjectMapper().writeValueAsString(stock));
 
@@ -127,26 +119,9 @@ public class StocksEndpointTestIT {
      * Method: createNewStock(Stock stock)
      */
     @Test
-    public void testCreateNewStock_withExistingID() throws Exception {
-
-        Stock stock = new Stock();
-        stock.setId(1); // exists by default
-        stock.setName("test");
-
-        MockHttpResponse response = server.resource(BASE_STOCK_PATH).post(MediaType.APPLICATION_JSON, defaultObjectMapper().writeValueAsString(stock));
-
-        assertEquals(400, response.getStatus());
-        checkErrorResponse(response.getContentAsString(), "bad_request", "stock with id already exists");
-    }
-
-    /**
-     * Method: createNewStock(Stock stock)
-     */
-    @Test
     public void testCreateNewStock_valid() throws Exception {
 
         Stock stock = new Stock();
-        stock.setId(System.currentTimeMillis());
         stock.setName("test");
 
         MockHttpResponse response = server.resource(BASE_STOCK_PATH).post(MediaType.APPLICATION_JSON, defaultObjectMapper().writeValueAsString(stock));
@@ -158,12 +133,12 @@ public class StocksEndpointTestIT {
 
         Stock created = defaultObjectMapper().readValue(stockJson, Stock.class);
         assertNotNull(created);
-        assertEquals(stock.getId(), created.getId());
+        assertTrue(created.getId() > 0);
         assertEquals(stock.getName(), created.getName());
         assertNotNull(created.getLastUpdate());
 
         //fetch stock and confirm
-        testFetchStockById(stock.getId());
+        testFetchStockById(created.getId());
     }
 
     /**
