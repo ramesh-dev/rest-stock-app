@@ -1,0 +1,209 @@
+{
+  "info": {
+    "_postman_id": "709f56bf-4a26-44fc-904b-d452569a3a6d",
+    "name": "Stock App",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Fetch All Stocks",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "42c7f2b6-7328-4114-b505-64ce0350b301",
+            "exec": [
+              "var responseJSON;",
+              "",
+              "try { responseJSON = JSON.parse(responseBody); }",
+              "catch (e) { }",
+              "",
+              "",
+              "tests[\"response has data\"] = responseJSON && responseJSON.data && (responseJSON.data.length === 256);",
+              "tests[\"content-type equals text/plain\"] = responseJSON && responseJSON.headers && (responseJSON.headers[\"content-type\"] === 'text/plain');"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/stocks",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "stocks"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Fetch Stock by ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "42c7f2b6-7328-4114-b505-64ce0350b301",
+            "exec": [
+              "var responseJSON;",
+              "",
+              "try { responseJSON = JSON.parse(responseBody); }",
+              "catch (e) { }",
+              "",
+              "",
+              "tests[\"response has data\"] = responseJSON && responseJSON.data && (responseJSON.data.length === 256);",
+              "tests[\"content-type equals text/plain\"] = responseJSON && responseJSON.headers && (responseJSON.headers[\"content-type\"] === 'text/plain');"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/stocks/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "stocks",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create New Stock",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "42c7f2b6-7328-4114-b505-64ce0350b301",
+            "exec": [
+              "var responseJSON;",
+              "",
+              "try { responseJSON = JSON.parse(responseBody); }",
+              "catch (e) { }",
+              "",
+              "",
+              "tests[\"response has data\"] = responseJSON && responseJSON.data && (responseJSON.data.length === 256);",
+              "tests[\"content-type equals text/plain\"] = responseJSON && responseJSON.headers && (responseJSON.headers[\"content-type\"] === 'text/plain');"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\":\"Payconiq\"}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/stocks",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "stocks"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Price for Stock",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "42c7f2b6-7328-4114-b505-64ce0350b301",
+            "exec": [
+              "var responseJSON;",
+              "",
+              "try { responseJSON = JSON.parse(responseBody); }",
+              "catch (e) { }",
+              "",
+              "",
+              "tests[\"response has data\"] = responseJSON && responseJSON.data && (responseJSON.data.length === 256);",
+              "tests[\"content-type equals text/plain\"] = responseJSON && responseJSON.headers && (responseJSON.headers[\"content-type\"] === 'text/plain');"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"currentPrice\": 100}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/stocks/6",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "stocks",
+            "6"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
