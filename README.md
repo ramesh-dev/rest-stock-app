@@ -26,6 +26,19 @@ gradle appengineRun
 ```
 app will be running on port `3000`
 
+### Test 
+To test the backend run the command,
+```
+gradle test 
+```
+
+### Postman Collection 
+
+If you like to try out the apis, i have added the postman collection json file, simply import it to the postman client
+```
+stock_app_postman_collection.json
+```
+
 
 ## Frontend 
 
