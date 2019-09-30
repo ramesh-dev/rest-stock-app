@@ -1,0 +1,64 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.google.cloud.tools:appengine-gradle-plugin:+'
+    }
+}
+
+plugins {
+    id 'java'
+    id 'idea'
+    id 'war'
+}
+
+
+// dependencies
+apply from: 'gradle/dependencies.gradle'
+
+
+/* using google AppEngine as container since it has in built jetty server for local run without any additional setup */
+apply plugin: 'com.google.cloud.tools.appengine-standard'
+
+group 'com.github.rameshl'
+version '1.0'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+
+    compileOnly libs.lombok
+
+    compile libs.slf4jJDKLogging
+    compile libs.jackson
+
+    providedCompile libs.servlet3Api
+    compile libs.appengine
+
+    compile libs.resteasy
+
+    //testing
+    testCompile libs.junit
+
+    // tiny helper library which i built to test resteasy resources
+    testCompile libs.resteasy_test_util
+}
+
+appengine {
+    run {
+        // port to run on
+        port = 3000
+    }
+
+    deploy {
+        projectId = "stock-app"
+    }
+}
